@@ -4,11 +4,22 @@
 use concordium_std::*;
 use core::fmt::Debug;
 
-/// Your smart contract state.
+
 #[derive(Serialize, SchemaType)]
-pub struct State {
-    // Your state
+pub struct State{
+    approvals: collections::BTreeMap<AccountAddress,bool>,
+    admins: Vec<AccountAddress>
 }
+
+
+impl State {    
+    pub fn new()-> Self {
+        let approvals = collections::BTreeMap::new();
+        let admins = Vec::new();
+        State { approvals, admins }
+    }
+}
+
 
 /// Your smart contract errors.
 #[derive(Debug, PartialEq, Eq, Reject, Serialize, SchemaType)]
@@ -24,8 +35,9 @@ pub enum Error {
 #[init(contract = "ccd_multisig")]
 fn init(_ctx: &InitContext, _state_builder: &mut StateBuilder) -> InitResult<State> {
     // Your code
+    let state = State::new();
 
-    Ok(State {})
+    Ok(state)
 }
 
 pub type MyInputType = bool;
