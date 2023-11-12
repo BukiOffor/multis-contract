@@ -8,8 +8,8 @@ use core::fmt::Debug;
 #[derive(Debug, Serial, DeserialWithState)]
 #[concordium(state_parameter = "S")]
 pub struct State<S: HasStateApi = StateApi> {
-    transactions: StateMap<u32,Proposal,S>,
-    admins: StateBox<Vec<Address>,S>,
+    pub transactions: StateMap<u32,Proposal,S>,
+    pub admins: StateBox<Vec<Address>,S>,
 }
 
 impl State {
@@ -35,13 +35,13 @@ pub trait IsOwner {
 // approve 
 #[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
 pub struct Proposal {
-    index: u32,
-    amount: Amount,
-    receiptient: AccountAddress,
-    voted: Vec<Address>,
-    approvals: u8,
-    fufilled: bool,
-    owner: Address
+    pub index: u32,
+    pub amount: Amount,
+    pub receiptient: AccountAddress,
+    pub voted: Vec<Address>,
+    pub approvals: u8,
+    pub fufilled: bool,
+    pub owner: Address
 }
 
 impl IsOwner for Proposal{}
@@ -94,18 +94,18 @@ pub enum Error {
 }
 #[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
 pub struct InitParameter {
-    admins : Vec<Address>
+    pub admins : Vec<Address>
 }
 #[derive(Serialize, SchemaType)]
 pub struct TxParameter {
-    index: u32,
-    receiver : AccountAddress,
-    amount: Amount,
+    pub index: u32,
+    pub receiver : AccountAddress,
+    pub amount: Amount,
 }
 
 #[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
 pub struct ApproveParameter {
-    index: u32,
+    pub index: u32,
 }
 
 /// Init function that creates a new smart contract.
@@ -172,15 +172,22 @@ pub fn create_tx(ctx: &ReceiveContext,host: &mut Host<State>)-> ReceiveResult<u3
 pub fn approve(ctx: &ReceiveContext,host: &mut Host<State>)-> ReceiveResult<bool>{
     let param:ApproveParameter = ctx.parameter_cursor().get()?;
     let index = param.index;
-    let votes_needed = host.state().voters();
-    let mut proposal = host.state_mut().transactions.get_mut(&index).unwrap();
-    ensure_eq!(index,proposal.index);
-    let approved = proposal.vote(ctx,votes_needed)?;
-    Ok(approved)
+    if host.state().is_owner(&ctx.sender()){
+        println!("ENTERED HERE");
+        let votes_needed = host.state().voters();
+        let mut proposal = host.state_mut().transactions.get_mut(&index)
+            .expect("The key does not exist");
+        ensure_eq!(index,proposal.index);
+        let approved = proposal.vote(ctx,votes_needed)?;
+        Ok(approved)
+    }else{
+        bail!()
+    }
+    
 }
 
 ///View function that returns the content of the state.
-#[receive(contract = "ccd_multisig", name = "view", return_value = "Proposal")]
+#[receive(contract = "ccd_multisig", name = "view",parameter="ApproveParameter",return_value = "Proposal")]
 fn view<'a, 'b>(ctx: &'a ReceiveContext, host: &'b Host<State>) ->   ReceiveResult<Proposal> {
     let param:ApproveParameter = ctx.parameter_cursor().get()?;
     let prop = host.state().transactions.get(&param.index).unwrap();
