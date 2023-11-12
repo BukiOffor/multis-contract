@@ -7,7 +7,7 @@ use core::fmt::Debug;
 
 #[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
 pub struct State{
-    transactions: collections::BTreeMap<u8,Proposal>,
+    transactions: collections::BTreeMap<u32,Proposal>,
     admins: Vec<Address>,
     //transactions: Vec<Proposal>
 }
@@ -84,23 +84,43 @@ pub enum Error {
 pub struct InitParameter {
     admins : Vec<Address>
 }
+#[derive(Serialize, SchemaType)]
+pub struct TxParameter {
+    index: u32,
+    receiver : Address,
+    amount: Amount,
+}
 
 /// Init function that creates a new smart contract.
 #[init(
     contract = "ccd_multisig",
     parameter="InitParameter"
 )]
-fn init(_ctx: &InitContext, _state_builder: &mut StateBuilder) -> InitResult<State> {
+fn init(ctx: &InitContext, _state_builder: &mut StateBuilder) -> InitResult<State> {
     // Your code
-    let state = State::new();
+    let param: InitParameter = ctx.parameter_cursor().get()?;
+    let mut state = State::new();
+    let admins = param.admins;
+    admins.iter().for_each(|i| state.admins.push(*i));
     Ok(state)
 }
 
 
-#[receive( contract = "ccd_multisig", name = "transfer",)]
-fn transfer(_ctx: &ReceiveContext, host: &Host<State>)-> ReceiveResult<()> {
-    let _balance = host.self_balance();
-    //host.invoke_transfer(receiver, amount)
+#[receive( contract = "ccd_multisig", name = "transfer", parameter="TxParameter", mutable)]
+fn transfer(ctx: &ReceiveContext, host: &Host<State>)-> ReceiveResult<()> {
+    let param:TxParameter = ctx.parameter_cursor().get()?;
+    let index = param.index;
+    let state = *host.state_mut();
+    let proposal = host.state_mut().transactions.get_mut(&index).unwrap();
+
+    let result = host.invoke_transfer(&proposal.receiptient, proposal.amount);
+
+    match result{
+        Ok(()) => {
+            proposal.fufilled = true;
+        }
+        Err(_) => {bail!()}
+    }
     Ok(())
 }
 
