@@ -122,7 +122,7 @@ async fn main() -> Result<(), Error> {
     // This is how you can use a type from your smart contract.
     //use ccd_multisig::MyInputType; // Example
 
-    let input_parameter  = TxParameter::default(); // Example
+    let input_parameter  = TxParameter::new(0,"3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe",10000); // Example
 
     // Create a successful transaction.
 
@@ -131,7 +131,7 @@ async fn main() -> Result<(), Error> {
     let update_payload = transactions::UpdateContractPayload {
         amount: Amount::from_ccd(0),
         address: init_result.contract_address,
-        receive_name: OwnedReceiveName::new_unchecked("ccd_multisig.receive".to_string()),
+        receive_name: OwnedReceiveName::new_unchecked("ccd_multisig.create_tx".to_string()),
         message: bytes.try_into()?,
     }; // Example
 
