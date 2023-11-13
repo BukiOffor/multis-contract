@@ -26,7 +26,7 @@ use ccd_multisig::{
     ApproveParameter,
     TxParameter
 }; // Example
-use crate::contracts_common::Address;
+use crate::contracts_common::{AccountAddress,Address};
 
 
 /// Reads the wasm module from a given file path.
@@ -97,9 +97,10 @@ async fn main() -> Result<(), Error> {
     let mut admins = Vec::new();
     admins.push(Address::from_str("3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe").unwrap());
     admins.push(Address::from_str("45FWHaAQz44w5VrcrX7XUeNHGwTvPHWRZGSUsdekqyw44Tz2iu").unwrap());
+    admins.push(Address::from_str("36J5gb5QVYBvbda4cZkagN4LvVCXejyX8ScuEx8xyAQckVjBMA").unwrap());
+
 
     let init_params = InitParameter{admins};
-
 
 
     let param: OwnedParameter = OwnedParameter::from_serial(&init_params).unwrap(); // Example
@@ -121,8 +122,9 @@ async fn main() -> Result<(), Error> {
 
     // This is how you can use a type from your smart contract.
     //use ccd_multisig::MyInputType; // Example
+    let receiver = AccountAddress::from_str("3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe").unwrap();
 
-    let input_parameter  = TxParameter::new(0,"3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe",10000); // Example
+    let input_parameter  = TxParameter::new(0,receiver,10000); // Example
 
     // Create a successful transaction.
 

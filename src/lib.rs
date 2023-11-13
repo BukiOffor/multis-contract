@@ -3,7 +3,6 @@
 //! # A Concordium V1 smart contract
 use concordium_std::*;
 use core::fmt::Debug;
-use std::str::FromStr;
 
 
 #[derive(Debug, Serial, DeserialWithState)]
@@ -108,8 +107,7 @@ impl TxParameter {
     pub fn default() -> Self {
         TxParameter { index: 0, receiver: AccountAddress([0u8; 32]), amount: (Amount { micro_ccd: 0 }) }
     }
-    pub fn new(index:u32, receiver:&str,amount:u64) -> Self {
-        let receiver = AccountAddress::from_str(receiver).unwrap();
+    pub fn new(index:u32, receiver:AccountAddress,amount:u64) -> Self {
         TxParameter { index, receiver, amount: Amount { micro_ccd: amount } }
     }
 }
