@@ -3,6 +3,7 @@
 //! # A Concordium V1 smart contract
 use concordium_std::*;
 use core::fmt::Debug;
+use std::str::FromStr;
 
 
 #[derive(Debug, Serial, DeserialWithState)]
@@ -107,7 +108,8 @@ impl TxParameter {
     pub fn default() -> Self {
         TxParameter { index: 0, receiver: AccountAddress([0u8; 32]), amount: (Amount { micro_ccd: 0 }) }
     }
-    pub fn new(index:u32, receiver:AccountAddress,amount:u64) -> Self {
+    pub fn new(index:u32, receiver:&str,amount:u64) -> Self {
+        let receiver = AccountAddress::from_str(receiver).unwrap();
         TxParameter { index, receiver, amount: Amount { micro_ccd: amount } }
     }
 }
@@ -133,14 +135,13 @@ fn init(ctx: &InitContext, state_builder: &mut StateBuilder) -> InitResult<State
     let param: InitParameter = ctx.parameter_cursor().get()?;
     let admins = param.admins;
     let state = State::new(state_builder,admins);
-    Ok(state)
-   
+    Ok(state)   
 }
 
 
-#[receive( contract = "ccd_multisig", name = "transfer", parameter="TxParameter", mutable)]
+#[receive( contract = "ccd_multisig", name = "transfer", parameter="ApproveParameter", mutable)]
 fn transfer(ctx: &ReceiveContext, host: &mut Host<State>)-> ReceiveResult<()> {
-    let param:TxParameter = ctx.parameter_cursor().get()?;
+    let param:ApproveParameter = ctx.parameter_cursor().get()?;
     let votes_needed = host.state().admins.len();
     let index = param.index;
     let approved = host.state_mut()
@@ -149,12 +150,21 @@ fn transfer(ctx: &ReceiveContext, host: &mut Host<State>)-> ReceiveResult<()> {
     let not_fufilled = host.state_mut()
         .transactions
         .get_mut(&index).unwrap().fufilled == false;
+    let amount = host.state_mut()
+        .transactions
+        .get(&index).unwrap().amount;
+    let receiptient = host.state_mut()
+        .transactions
+        .get(&index).unwrap().receiptient;
+    if host.self_balance() < amount {
+        bail!()
+    }
     match (approved,not_fufilled) {
         (true,true) => {
             host.state_mut()
             .transactions
             .get_mut(&index).unwrap().fufilled = true;
-            let response = host.invoke_transfer(&param.receiver, param.amount);
+            let response = host.invoke_transfer(&receiptient, amount);
             match response{
                 Ok(()) => Ok(()),
                 Err(_) => bail!()
