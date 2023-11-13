@@ -5,6 +5,7 @@ use concordium_std::*;
 use core::fmt::Debug;
 
 
+
 #[derive(Debug, Serial, DeserialWithState)]
 #[concordium(state_parameter = "S")]
 pub struct State<S: HasStateApi = StateApi> {
@@ -33,7 +34,7 @@ pub trait IsOwner {
 
 // proposal <amount, address>
 // approve 
-#[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
+#[derive(Serialize, SchemaType, Debug, PartialEq, Eq, Clone)]
 pub struct Proposal {
     pub index: u32,
     pub amount: Amount,
@@ -90,7 +91,8 @@ pub enum Error {
     /// Your error
     YourError,
     AlreadyVoted,
-    TransactionHasNotBeenApprovedOrAlreadyFufilled
+    TransactionHasNotBeenApprovedOrAlreadyFufilled,
+    TransactionKeyAlreadyExists
 }
 #[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
 pub struct InitParameter {
@@ -183,12 +185,16 @@ fn insert(ctx: &ReceiveContext,host: &Host<State>,amount: Amount
 
 /// initialises a new transaction pending approval
 #[receive(contract = "ccd_multisig", name = "create_tx", parameter="TxParameter", mutable)]
-pub fn create_tx(ctx: &ReceiveContext,host: &mut Host<State>)-> ReceiveResult<u32>{
-    let index = host.state().admins.len() as u32;
+pub fn create_tx(ctx: &ReceiveContext,host: &mut Host<State>)-> Result<u32, Error>{
     let param:TxParameter = ctx.parameter_cursor().get()?;
-    let proposal = Proposal::new(index,param.amount,param.receiver,0,ctx.sender());
-    host.state_mut().transactions.insert(index, proposal);
-    Ok(index)
+    if let None = host.state().transactions.get(&param.index){
+        let proposal = Proposal::new(param.index,param.amount,param.receiver,0,ctx.sender());
+            host.state_mut().transactions.insert(param.index, proposal);
+            Ok(param.index)
+    }else{
+        Err(Error::TransactionKeyAlreadyExists)        
+    }
+    
 }
 
 #[receive(contract = "ccd_multisig", name = "approve", parameter="ApproveParameter", mutable)]

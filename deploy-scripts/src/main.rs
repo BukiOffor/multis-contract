@@ -92,8 +92,7 @@ async fn main() -> Result<(), Error> {
         }
     }
 
-    // Write your own deployment/initialization script below. An example is given
-    // here.
+   // Initialise the Contract by proposing
     let mut admins = Vec::new();
     admins.push(Address::from_str("3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe").unwrap());
     admins.push(Address::from_str("45FWHaAQz44w5VrcrX7XUeNHGwTvPHWRZGSUsdekqyw44Tz2iu").unwrap());
@@ -106,7 +105,7 @@ async fn main() -> Result<(), Error> {
     let param: OwnedParameter = OwnedParameter::from_serial(&init_params).unwrap(); // Example
 
 
-    let init_method_name: &str = "init_ccd_multisig.init"; // Example
+    let init_method_name: &str = "init_ccd_multisig"; // Example
 
     let payload = InitContractPayload {
         init_name: OwnedContractName::new(init_method_name.into())?,
@@ -121,7 +120,8 @@ async fn main() -> Result<(), Error> {
         .context("Failed to initialize the contract.")?; // Example
 
     // This is how you can use a type from your smart contract.
-    //use ccd_multisig::MyInputType; // Example
+    // Update Contract by proposing a Transaction
+
     let receiver = AccountAddress::from_str("3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe").unwrap();
 
     let input_parameter  = TxParameter::new(0,receiver,10000); // Example

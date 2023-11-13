@@ -113,6 +113,15 @@ fn test_should_fail_if_admin_tries_to_approve_twice(){
 
 // cargo run -- --node http://node.testnet.concordium.com:20000 --account ~/3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe.export --module ~/ccd-multisig/concordium-out/module.wasm.v1
 
+//DEPLOYING CONTRACT
+// 19f525965028ce5d5b1956118da1a4d74577381451cdd839df1b329661803d0b <-- module ref
+// c14afeeba9a260ef2365138ad0b10b27e39667e5588ae99df216efd9002d0660 <-- deployment tx-hash
+
+// INITIALIZING CONTRACT
+// 96051b1d4fab7b5c0d2d160715a3468a87b49673ab43f3f51d8d5a7bd7d35073 <-- tx-hash
+
+// UPDATING CONTRACT 
+// 5f9730f97be67c7e3f2b0365e80780357a419280b0e6dc2208441377a93bb710 <-- tx-hash
 
 
 
