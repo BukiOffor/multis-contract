@@ -56,7 +56,7 @@ impl Proposal {
         Proposal{index,amount,receiptient,voted,approvals,fufilled:false,owner}
     }
 
-    pub fn vote(&mut self,ctx: &ReceiveContext, votes_needed: usize )->Result<bool,Error> {
+    pub fn approve(&mut self,ctx: &ReceiveContext, votes_needed: usize )->Result<bool,Error> {
        if self.voted.contains(&ctx.sender()) {
             return Err(Error::AlreadyVoted)
        }else {
@@ -192,7 +192,7 @@ pub fn approve(ctx: &ReceiveContext,host: &mut Host<State>)-> ReceiveResult<bool
         let mut proposal = host.state_mut().transactions.get_mut(&index)
             .expect("The key does not exist");
         ensure_eq!(index,proposal.index);
-        let approved = proposal.vote(ctx,votes_needed)?;
+        let approved = proposal.approve(ctx,votes_needed)?;
         Ok(approved)
     }else{
         bail!()
@@ -210,4 +210,12 @@ fn view<'a, 'b>(ctx: &'a ReceiveContext, host: &'b Host<State>) ->   ReceiveResu
     let (index,amount,receiptient, approvals,fufilled, owner) = (prop.index,prop.amount,prop.receiptient,prop.approvals,prop.fufilled,prop.owner);
     Ok(Proposal{index,amount,receiptient,voted,approvals,fufilled,owner})
 
+}
+
+#[receive(contract = "ccd_multisig", name = "get_admins",parameter="ApproveParameter",return_value = "Proposal")]
+fn get_admins<'a, 'b>(_ctx: &'a ReceiveContext, host: &'b Host<State>) ->   ReceiveResult<Vec<Address>> {
+    let admins = host.state().admins.clone();
+    let mut voted = Vec::new();
+    admins.iter().for_each(|admin| voted.push(*admin));
+    Ok(voted)
 }

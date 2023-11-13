@@ -56,12 +56,22 @@ fn test_creating_a_transaction(){
             message:      OwnedParameter::from_serial(&param).unwrap()
         })
         .unwrap();
+    
 }
 #[test]
 fn test_is_address(){
     let address = Address::from_str("45FWHaAQz44w5VrcrX7XUeNHGwTvPHWRZGSUsdekqyw44Tz2iu").unwrap();
     assert_eq!(address.is_account(), true);
 }
+
+#[test]
+fn test_is_acc_address(){
+    let address = AccountAddress::from_str("45FWHaAQz44w5VrcrX7XUeNHGwTvPHWRZGSUsdekqyw44Tz2iu").unwrap();
+    println!("{}", address)
+    //assert_eq!(address.is_account(), true);
+}
+
+
 
 #[test]
 fn test_view_proposal(){
@@ -101,9 +111,7 @@ fn test_should_fail_if_admin_tries_to_approve_twice(){
 }
 
 
-
-
-
+// cargo run -- --node http://node.testnet.concordium.com:20000 --account ~/3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe.export --module ~/ccd-multisig/concordium-out/module.wasm.v1
 
 
 
