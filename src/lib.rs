@@ -125,6 +125,7 @@ impl ApproveParameter {
     }
 }
 
+
 /// Init function that creates a new smart contract.
 #[init(
     contract = "ccd_multisig",
@@ -178,7 +179,8 @@ fn transfer(ctx: &ReceiveContext, host: &mut Host<State>)-> ReceiveResult<()> {
 /// This function recieves CCD from anybody
 #[receive(contract = "ccd_multisig", name = "insert", payable)]
 #[allow(unused_variables)]
-fn insert(ctx: &ReceiveContext,host: &Host<State>,amount: Amount
+fn insert(
+    ctx: &ReceiveContext,host: &Host<State>,amount: Amount
 ) -> ReceiveResult<()> {
     Ok(())
 }
@@ -232,4 +234,12 @@ fn get_admins<'a, 'b>(_ctx: &'a ReceiveContext, host: &'b Host<State>) ->   Rece
     let mut voted = Vec::new();
     admins.iter().for_each(|admin| voted.push(*admin));
     Ok(voted)
+}
+
+#[receive(contract = "ccd_multisig", name = "get_votes_remaining",parameter="ApproveParameter",return_value = "Proposal")]
+fn get_votes_remaining<'a, 'b>(ctx: &'a ReceiveContext, host: &'b Host<State>) ->   ReceiveResult<u8> {
+    let admins = host.state().admins.clone();
+    let param:ApproveParameter = ctx.parameter_cursor().get()?;
+    let proposal = host.state().transactions.get(&param.index).unwrap();
+    Ok(admins.len() as u8 - proposal.approvals)
 }

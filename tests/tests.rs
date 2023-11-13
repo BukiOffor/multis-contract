@@ -75,13 +75,36 @@ fn test_is_acc_address(){
 
 #[test]
 fn test_view_proposal(){
-   todo!()
+
 }
 
 
 #[test]
 fn test_approving_a_transaction(){
-    todo!()
+    let (mut chain, init) = initialize();
+    let param = TxParameter{
+        index: 0,
+        amount:Amount::from_ccd(100_000),
+        receiver: BOB
+    };
+    // Update the contract via the `receive` entrypoint with the parameter `false`.
+    chain
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(100_000), UpdateContractPayload {
+            address:      init.contract_address,
+            amount:       Amount::zero(),
+            receive_name: OwnedReceiveName::new_unchecked("ccd_multisig.create_tx".to_string()),
+            message:      OwnedParameter::from_serial(&param).unwrap()
+        })
+        .unwrap();
+    let app_tx = ApproveParameter::new(1);
+    chain
+        .contract_update(SIGNER, ALICE, ALICE_ADDR, Energy::from(100_000), UpdateContractPayload {
+            address:      init.contract_address,
+            amount:       Amount::zero(),
+            receive_name: OwnedReceiveName::new_unchecked("ccd_multisig.approve".to_string()),
+            message:      OwnedParameter::from_serial(&app_tx).unwrap()
+        })
+        .unwrap();
 }
 
 
