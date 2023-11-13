@@ -1,5 +1,7 @@
 use concordium_smart_contract_testing::*;
 use ccd_multisig::*;
+use std::str::FromStr;
+
 
 /// A test account.
 const ALICE: AccountAddress = AccountAddress([0u8; 32]);
@@ -54,6 +56,11 @@ fn test_creating_a_transaction(){
             message:      OwnedParameter::from_serial(&param).unwrap()
         })
         .unwrap();
+}
+#[test]
+fn test_is_address(){
+    let address = Address::from_str("45FWHaAQz44w5VrcrX7XUeNHGwTvPHWRZGSUsdekqyw44Tz2iu").unwrap();
+    assert_eq!(address.is_account(), true);
 }
 
 #[test]

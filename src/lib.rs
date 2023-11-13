@@ -103,9 +103,24 @@ pub struct TxParameter {
     pub amount: Amount,
 }
 
+impl TxParameter {
+    pub fn default() -> Self {
+        TxParameter { index: 0, receiver: AccountAddress([0u8; 32]), amount: (Amount { micro_ccd: 0 }) }
+    }
+    pub fn new(index:u32, receiver:AccountAddress,amount:u64) -> Self {
+        TxParameter { index, receiver, amount: Amount { micro_ccd: amount } }
+    }
+}
+
 #[derive(Serialize, SchemaType, Debug, PartialEq, Eq)]
 pub struct ApproveParameter {
     pub index: u32,
+}
+
+impl ApproveParameter {
+    pub fn new(index: u32) -> Self {
+        Self {index}
+    }
 }
 
 /// Init function that creates a new smart contract.
@@ -173,7 +188,6 @@ pub fn approve(ctx: &ReceiveContext,host: &mut Host<State>)-> ReceiveResult<bool
     let param:ApproveParameter = ctx.parameter_cursor().get()?;
     let index = param.index;
     if host.state().is_owner(&ctx.sender()){
-        println!("ENTERED HERE");
         let votes_needed = host.state().voters();
         let mut proposal = host.state_mut().transactions.get_mut(&index)
             .expect("The key does not exist");

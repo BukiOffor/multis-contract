@@ -18,7 +18,16 @@ use deployer::{DeployResult, Deployer, InitResult};
 use std::{
     io::Cursor,
     path::{Path, PathBuf},
+    str::FromStr
 };
+#[allow(unused_imports)]
+use ccd_multisig::{
+    InitParameter,
+    ApproveParameter,
+    TxParameter
+}; // Example
+use crate::contracts_common::Address;
+
 
 /// Reads the wasm module from a given file path.
 fn get_wasm_module(file: &Path) -> Result<WasmModule, Error> {
@@ -85,10 +94,18 @@ async fn main() -> Result<(), Error> {
 
     // Write your own deployment/initialization script below. An example is given
     // here.
+    let mut admins = Vec::new();
+    admins.push(Address::from_str("3UsPQ4MxhGNLEbYac53H7C2JHzE3Xe41zrgCdLVrp5vphx4YSe").unwrap());
+    admins.push(Address::from_str("45FWHaAQz44w5VrcrX7XUeNHGwTvPHWRZGSUsdekqyw44Tz2iu").unwrap());
 
-    let param: OwnedParameter = OwnedParameter::empty(); // Example
+    let init_params = InitParameter{admins};
 
-    let init_method_name: &str = "init_ccd_multisig"; // Example
+
+
+    let param: OwnedParameter = OwnedParameter::from_serial(&init_params).unwrap(); // Example
+
+
+    let init_method_name: &str = "init_ccd_multisig.init"; // Example
 
     let payload = InitContractPayload {
         init_name: OwnedContractName::new(init_method_name.into())?,
@@ -103,9 +120,9 @@ async fn main() -> Result<(), Error> {
         .context("Failed to initialize the contract.")?; // Example
 
     // This is how you can use a type from your smart contract.
-    use ccd_multisig::MyInputType; // Example
+    //use ccd_multisig::MyInputType; // Example
 
-    let input_parameter: MyInputType = false; // Example
+    let input_parameter  = TxParameter::default(); // Example
 
     // Create a successful transaction.
 
