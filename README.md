@@ -46,40 +46,40 @@ Sent transaction with hash: dac25b186fc132c159efdcaa11efb09d35ca6d13db8a3754b99b
 Transaction finalized: tx_hash=dac25b186fc132c159efdcaa11efb09d35ca6d13db8a3754b99b121081edf881
 ```
 
-#### A screenshot of the contract deployment on the concordium block explorer
+### A screenshot of the contract deployment on the concordium block explorer
 ![Screenshot of deployment](./img/Screen%20Shot%202023-11-14%20at%201.35.33%20AM.png)
 
 
-#### A Screenshot of Contract Initialization on the block explorer 
+### A Screenshot of Contract Initialization on the block explorer 
 ![Screenshot of deployment](./img/contract_init.png)
 
 
-#### A screenshot of Contract Update(creating a transaction proposal) on the concordium block explorer.
+### A screenshot of Contract Update(creating a transaction proposal) on the concordium block explorer.
 ![Screenshot of deployment](./img/contract_create_tx.png)
 
 Next we simulate approving the transaction proposal on the smart contract, a signatory can only approve a given transaction once while a none signatory cannot approve a transaction. Calling the `approve()` function with a signatory account returns successful with the transaction hash ```ee196c8bcab0696d2b3f75142eb6b164f9dc6a1d62d6b9aee1211e6f3b56d6be```.
 
-#### Screenshot of successful approve call by a signatory
+### Screenshot of successful approve call by a signatory
 ![Screenshot of succesful approval](./img/signatory_approve.png)
 if we try to approve the contract again with the same signatory the transaction fails as can be seen here
 ```b48532306b18bef1281ade6fc7ef63329c701adeac85921b402fef87f457a988```.
 
-#### Screenshot of failed double approval by same signatory
+### Screenshot of failed double approval by same signatory
 ![Screenshot of failed transaction](./img/failed_tx.png)
 Also if a signatory tries to execute a transaction without complete approval from all signatory the transactions reverts as can be seen here ``` 94aac8cdb042df10acc0cbe34f9b667ebeac4887e11cf52a4be1b53be9c73697``` 
 
-#### Screenshot of failed attempted to execute transaction without complete approval 
+### Screenshot of failed attempted to execute transaction without complete approval 
 ![Screenshot of failed transaction](./img/transfer_failed.png)
 The remaining signatories signs and approves the transaction here ```149a68779bcd753e9770c858663d4d965e1b69655ee3683264dc1a33b20e8e55``` and here ```83e5ac63c44ebb8068d0fcfdff9cdb6e89945d49007681d34bb7396b7ca3e353```
 
 Now that the transaction has been approved, we will attempt to excute the transaction. At first the transcation fails here `cee9c225daf4f2d896dbcd1abedb6e537c3d39144262ab0460e6bce2c0f55b44` because the smart contract has no ccd in it. so we sent some ccd to the contract here with the `insert()` function `674a07cd3b06c52172e54aef68db21c432e76b2877820bf1e20ddca02f9bb84c`.
 
-#### Screenshot of CCD transfer to contract
+### Screenshot of CCD transfer to contract
 ![Screenshot of sent ccd](./img/insert_tx.png)
 
 Finally, we call execute the transaction here by calling the `transfer()` function. The transfer executes successfully with this transaction hash `26ffc4ee9377046f4db0d3548ba48abcb404f22994c648da49c3ba20fa0aae4a` and the screenshot of transfer below. 
 
-#### Screenshot of successful execution of transaction 
+### Screenshot of successful execution of transaction 
 ![Screenshot of succesful execution](./img/transfer_successful.png)
 
 Security Check:
